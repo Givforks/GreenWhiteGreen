@@ -62,3 +62,26 @@ Example response:
 
 If you put keys in frontend JS, anyone can view and steal them.
 Use your backend as a secure proxy so the key stays private.
+
+## Quick Local Test Script (PowerShell)
+
+You can run a single script that:
+
+- checks `.env`
+- installs backend dependencies
+- starts server in background
+- tests health and weather endpoints
+- stops the server job
+
+Run:
+
+```powershell
+cd backend
+./test-local.ps1
+```
+
+Optional city parameter:
+
+```powershell
+./test-local.ps1 -City "Abuja"
+```

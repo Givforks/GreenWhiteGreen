@@ -16,8 +16,7 @@ if (-not (Test-Path ".env")) {
 $envContent = Get-Content ".env" -Raw
 if ($envContent -match "OPENWEATHER_API_KEY=your_openweather_api_key_here" -or $envContent -notmatch "OPENWEATHER_API_KEY=") {
     Write-Host "OPENWEATHER_API_KEY is not configured in backend/.env"
-    Write-Host "Please set a real API key and run again."
-    exit 1
+    Write-Host "Continuing in fallback mode (wttr.in, no key)."
 }
 
 Write-Host "Installing dependencies..."

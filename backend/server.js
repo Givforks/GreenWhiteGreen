@@ -11,13 +11,36 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+function mapWttrWeather(payload, cityInput) {
+  const current = payload?.current_condition?.[0] || {};
+  const nearestArea = payload?.nearest_area?.[0] || {};
+
+  return {
+    ok: true,
+    source: "wttr.in (no key mode)",
+    city: nearestArea?.areaName?.[0]?.value || cityInput,
+    country: nearestArea?.country?.[0]?.value || "N/A",
+    temperatureC: Number(current?.temp_C ?? 0),
+    feelsLikeC: Number(current?.FeelsLikeC ?? 0),
+    condition: (current?.weatherDesc?.[0]?.value || "clear").toLowerCase(),
+    iconCode: null,
+    isDay: true,
+    humidity: Number(current?.humidity ?? 0),
+    windSpeed: Number(current?.windspeedKmph ?? 0) / 3.6,
+  };
+}
+
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true, service: "weather-proxy" });
 });
 
 app.get("/api/weather", async (req, res) => {
   const city = req.query.city;
-  const apiKey = process.env.OPENWEATHER_API_KEY;
+  const rawApiKey = process.env.OPENWEATHER_API_KEY;
+  const apiKey =
+    typeof rawApiKey === "string" ? rawApiKey.trim() : "";
+  const hasUsableApiKey =
+    apiKey !== "" && apiKey !== "your_openweather_api_key_here";
 
   if (!city || String(city).trim() === "") {
     return res.status(400).json({
@@ -26,15 +49,28 @@ app.get("/api/weather", async (req, res) => {
     });
   }
 
-  if (!apiKey) {
-    return res.status(500).json({
-      ok: false,
-      message:
-        "Server is missing OPENWEATHER_API_KEY. Add it to backend/.env first.",
-    });
-  }
-
   try {
+    if (!hasUsableApiKey) {
+      const fallbackUrl = new URL(`https://wttr.in/${encodeURIComponent(String(city).trim())}`);
+      fallbackUrl.searchParams.set("format", "j1");
+
+      const fallbackResponse = await fetch(fallbackUrl, {
+        headers: {
+          "User-Agent": "weather-proxy-demo/1.0",
+        },
+      });
+      const fallbackData = await fallbackResponse.json();
+
+      if (!fallbackResponse.ok) {
+        return res.status(fallbackResponse.status).json({
+          ok: false,
+          message: "Fallback weather provider request failed",
+        });
+      }
+
+      return res.json(mapWttrWeather(fallbackData, String(city).trim()));
+    }
+
     const externalUrl = new URL("https://api.openweathermap.org/data/2.5/weather");
     externalUrl.searchParams.set("q", String(city).trim());
     externalUrl.searchParams.set("appid", apiKey);

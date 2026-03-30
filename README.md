@@ -5,6 +5,7 @@ This project shows how to build a simple fullstack app where:
 - Frontend calls your own backend (`/api/weather`)
 - Backend calls a third-party API (OpenWeather)
 - API key is stored safely on the server in `.env`
+- If no API key is set, backend falls back to a no-key provider for quick testing
 
 ## Project Structure
 
@@ -17,6 +18,7 @@ This project shows how to build a simple fullstack app where:
 
 1. Create an account at OpenWeather: https://openweathermap.org/api
 2. Copy your API key
+3. New keys can take a short time to activate
 
 ## 2) Configure Environment Variable
 
@@ -26,6 +28,9 @@ Create `backend/.env`:
 OPENWEATHER_API_KEY=your_real_api_key_here
 PORT=5000
 ```
+
+If you do not have a key yet, leave the placeholder value for now.
+The app will run in fallback mode until you add a real key.
 
 ## 3) Install and Run
 
@@ -41,6 +46,11 @@ Open `http://localhost:5000` in your browser.
 
 - `GET /api/health`
 - `GET /api/weather?city=Lagos`
+
+Provider behavior:
+
+- Uses OpenWeather when `OPENWEATHER_API_KEY` is configured
+- Falls back to `wttr.in` when key is missing
 
 Example response:
 
@@ -72,6 +82,8 @@ You can run a single script that:
 - starts server in background
 - tests health and weather endpoints
 - stops the server job
+
+If no API key is configured, the script still runs and tests fallback mode.
 
 Run:
 

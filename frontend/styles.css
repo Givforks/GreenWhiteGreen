@@ -90,6 +90,84 @@ button:hover {
 	color: var(--purple-700);
 }
 
+#result {
+	background:
+		linear-gradient(160deg, rgba(90, 24, 154, 0.92) 0%, rgba(15, 118, 110, 0.92) 100%),
+		radial-gradient(circle at 90% 10%, rgba(255, 255, 255, 0.2), transparent 35%);
+	color: #f8f7ff;
+	border: 1px solid rgba(255, 255, 255, 0.35);
+	overflow: hidden;
+}
+
+#result h2,
+#result p {
+	color: inherit;
+}
+
+#result.is-error {
+	background: linear-gradient(145deg, #5a1124 0%, #8a1538 100%);
+}
+
+#result.is-loading {
+	background: linear-gradient(145deg, #3d1f6c 0%, #0f766e 100%);
+}
+
+.status-text {
+	margin: 0;
+	font-weight: 600;
+}
+
+.weather-head {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 1rem;
+}
+
+.weather-tag {
+	background: rgba(255, 255, 255, 0.2);
+	padding: 0.3rem 0.7rem;
+	border-radius: 999px;
+	font-size: 0.9rem;
+	text-transform: capitalize;
+}
+
+.weather-main {
+	font-size: clamp(2.4rem, 6vw, 3.5rem);
+	font-weight: 700;
+	line-height: 1;
+	margin: 0.6rem 0 1rem;
+}
+
+.weather-grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 0.75rem;
+}
+
+.metric {
+	background: rgba(255, 255, 255, 0.15);
+	backdrop-filter: blur(2px);
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	border-radius: 0.75rem;
+	padding: 0.7rem;
+	margin: 0;
+}
+
+.metric-label {
+	font-size: 0.78rem;
+	opacity: 0.85;
+	margin: 0 0 0.2rem;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.metric-value {
+	font-size: 1.05rem;
+	font-weight: 700;
+	margin: 0;
+}
+
 .note ul {
 	margin-bottom: 0;
 }
@@ -97,5 +175,9 @@ button:hover {
 @media (max-width: 600px) {
 	.controls {
 		flex-direction: column;
+	}
+
+	.weather-grid {
+		grid-template-columns: 1fr;
 	}
 }

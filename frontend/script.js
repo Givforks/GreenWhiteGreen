@@ -4,6 +4,14 @@ const searchBtn = document.getElementById("searchBtn");
 const result = document.getElementById("result");
 let countryMap = {};
 
+// Currency corner elements
+const currencyCorners = {
+  tl: document.getElementById("currency-tl"),
+  tr: document.getElementById("currency-tr"),
+  bl: document.getElementById("currency-bl"),
+  br: document.getElementById("currency-br"),
+};
+
 function setTheme(isDay) {
   document.body.classList.remove("theme-day", "theme-night");
   document.body.classList.add(isDay ? "theme-day" : "theme-night");
@@ -49,10 +57,65 @@ async function loadCountries() {
     if (!data.ok) {
       setMessage("Failed to load countries", "error");
       return;
+
+    async function displayCurrencies(countryCode) {
+      try {
+        // Fetch country details from restcountries API for currency info
+        const response = await fetch(`https://restcountries.com/v3.1/alpha/${countryCode.toLowerCase()}?fields=currencies,flags`);
+        const data = await response.json();
+
+        if (!data || !data.currencies) {
+          clearCurrencyDisplay();
+          return;
+        }
+    }
+        const currencies = Object.entries(data.currencies || {});
+    
+        // Get up to 4 currencies
+        const currencyList = currencies.slice(0, 4).map(([code, info]) => ({
+          code: code,
+          symbol: info?.symbol || "",
+          name: info?.name || code,
+        }));
+
+        // Pad with empty if less than 4
+        while (currencyList.length < 4) {
+          currencyList.push(null);
+        }
+    const options = data.countries.map((c) => `<option value="${c.code}">${c.flag} ${c.name}</option>`).join("");
+        // Display currencies in corners: TL, TR, BL, BR
+        const corners = ["tl", "tr", "bl", "br"];
+        corners.forEach((corner, index) => {
+          const currency = currencyList[index];
+          const cornerEl = currencyCorners[corner];
+    countrySelect.innerHTML = `<option value="">Select a country...</option>${options}`;
+          if (currency) {
+            cornerEl.innerHTML = `
+              <div class="currency-symbol">${currency.symbol || "₹"}</div>
+              <div class="currency-code">${currency.code}</div>
+              <div class="currency-name">${currency.name.substring(0, 20)}</div>
+            `;
+            cornerEl.classList.add("active");
+          } else {
+            cornerEl.classList.remove("active");
+          }
+        });
+      } catch (error) {
+        console.error("Error fetching currencies:", error);
+        clearCurrencyDisplay();
+      }
     }
 
-    const options = data.countries.map((c) => `<option value="${c.code}">${c.flag} ${c.name}</option>`).join("");
-    countrySelect.innerHTML = `<option value="">Select a country...</option>${options}`;
+    function clearCurrencyDisplay() {
+      Object.values(currencyCorners).forEach((corner) => {
+        corner.classList.remove("active");
+        corner.innerHTML = "";
+      });
+    }
+
+    async function loadCountries() {
+      try {
+        const response = await fetch("/api/countries");
     countryMap = data.countries.reduce((acc, c) => {
       acc[c.code] = c.name;
       return acc;
@@ -129,9 +192,16 @@ citySearch.addEventListener("keydown", (event) => {
     getWeather();
   }
 });
-countrySelect.addEventListener("change", (_event) => {
+countrySelect.addEventListener("change", (event) => {
+  const countryCode = event.target.value;
+  if (countryCode) {
+    displayCurrencies(countryCode);
+  } else {
+    clearCurrencyDisplay();
+  }
   citySearch.focus();
 });
 
 loadCountries();
+clearCurrencyDisplay();
 setTheme(true);

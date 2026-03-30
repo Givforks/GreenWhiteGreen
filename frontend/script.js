@@ -1,6 +1,8 @@
-const cityInput = document.getElementById("cityInput");
+const countrySelect = document.getElementById("countrySelect");
+const citySearch = document.getElementById("citySearch");
 const searchBtn = document.getElementById("searchBtn");
 const result = document.getElementById("result");
+let countryMap = {};
 
 function setTheme(isDay) {
   document.body.classList.remove("theme-day", "theme-night");
@@ -39,18 +41,45 @@ function setMessage(message, type = "info") {
   result.innerHTML = `<p class="status-text">${message}</p>`;
 }
 
-async function getWeather() {
-  const city = cityInput.value.trim();
+async function loadCountries() {
+  try {
+    const response = await fetch("/api/countries");
+    const data = await response.json();
 
-  if (!city) {
-    setMessage("Please type a city name first.", "error");
+    if (!data.ok) {
+      setMessage("Failed to load countries", "error");
+      return;
+    }
+
+    const options = data.countries.map((c) => `<option value="${c.code}">${c.flag} ${c.name}</option>`).join("");
+    countrySelect.innerHTML = `<option value="">Select a country...</option>${options}`;
+    countryMap = data.countries.reduce((acc, c) => {
+      acc[c.code] = c.name;
+      return acc;
+    }, {});
+  } catch (error) {
+    setMessage(`Error loading countries: ${error.message}`, "error");
+  }
+}
+
+async function getWeather() {
+  const query = citySearch.value.trim();
+  const countryCode = countrySelect.value;
+
+  if (!query) {
+    setMessage("Please enter a city or location.", "error");
     return;
+  }
+
+  let location = query;
+  if (countryCode && countryMap[countryCode]) {
+    location = `${query}, ${countryMap[countryCode]}`;
   }
 
   setMessage("Loading weather data...", "loading");
 
   try {
-    const response = await fetch(`/api/weather?city=${encodeURIComponent(city)}`);
+    const response = await fetch(`/api/weather?location=${encodeURIComponent(location)}`);
     const data = await response.json();
 
     if (!response.ok || !data.ok) {
@@ -61,20 +90,23 @@ async function getWeather() {
     const iconKind = pickIconKind(data);
     setTheme(Boolean(data.isDay));
 
+    const regionDisplay = data.region && data.region !== data.country ? `${data.region}, ` : "";
+
     result.classList.remove("is-error", "is-loading");
     result.innerHTML = `
       <div class="weather-head">
-        <h2>${data.city}, ${data.country}</h2>
+        <h2>${data.city}</h2>
+        <span class="location-info">${regionDisplay}${data.country}</span>
         <span class="weather-tag">${data.condition}</span>
       </div>
       <div class="weather-hero">
-        <div class="weather-main">${Math.round(data.temperatureC)} C</div>
+        <div class="weather-main">${Math.round(data.temperatureC)} °C</div>
         <div class="weather-icon weather-icon-${iconKind}" aria-hidden="true"></div>
       </div>
       <div class="weather-grid">
         <article class="metric">
           <p class="metric-label">Feels Like</p>
-          <p class="metric-value">${Math.round(data.feelsLikeC)} C</p>
+          <p class="metric-value">${Math.round(data.feelsLikeC)} °C</p>
         </article>
         <article class="metric">
           <p class="metric-label">Humidity</p>
@@ -92,10 +124,14 @@ async function getWeather() {
 }
 
 searchBtn.addEventListener("click", getWeather);
-cityInput.addEventListener("keydown", (event) => {
+citySearch.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
     getWeather();
   }
 });
+countrySelect.addEventListener("change", (_event) => {
+  citySearch.focus();
+});
 
+loadCountries();
 setTheme(true);

@@ -92,6 +92,12 @@ cd backend
 ./test-local.ps1
 ```
 
+Keep server running for frontend testing:
+
+```powershell
+./test-local.ps1 -City "Lagos" -KeepServerRunning
+```
+
 Optional city parameter:
 
 ```powershell

@@ -3,32 +3,52 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>REST API Key Demo</title>
+    <title>Global Weather Explorer</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <main class="container">
-      <h1>REST API + External API Key Demo</h1>
-      <p>
-        This frontend calls your backend endpoint.
-        The backend stores the secret API key and calls OpenWeather for you.
-      </p>
+      <header class="header">
+        <h1>🌍 Global Weather Explorer</h1>
+        <p class="tagline">Explore weather worldwide across 195+ countries</p>
+      </header>
 
-      <div class="controls">
-        <input id="cityInput" placeholder="Enter city (e.g. Abuja)" />
-        <button id="searchBtn">Get Weather</button>
-      </div>
+      <section class="location-picker">
+        <div class="picker-section">
+          <label for="countrySelect">Country</label>
+          <select id="countrySelect" class="picker-input">
+            <option value="">Loading countries...</option>
+          </select>
+        </div>
 
-      <section id="result" class="card" aria-live="polite">
-        <p>Search for a city to load weather data.</p>
+        <div class="picker-section">
+          <label for="citySearch">City or Location</label>
+          <input
+            id="citySearch"
+            type="text"
+            class="picker-input"
+            placeholder="Search city, town, or region..."
+            minlength="2"
+          />
+        </div>
+
+        <button id="searchBtn" class="search-button">Get Weather</button>
       </section>
 
-      <section class="card note">
-        <h2>Why this is secure</h2>
+      <section id="result" class="result-card" aria-live="polite">
+        <p class="placeholder-text">Select a location to load weather data.</p>
+      </section>
+
+      <section class="info-card">
+        <h2>How it works</h2>
         <ul>
-          <li>The API key is in <code>backend/.env</code>, not in browser JavaScript.</li>
-          <li>The browser only calls your backend route: <code>/api/weather</code>.</li>
-          <li>The backend talks to OpenWeather using the secret key.</li>
+          <li>
+            Choose a <strong>country</strong> or search for any
+            <strong>city worldwide</strong>
+          </li>
+          <li>Weather data is fetched securely via your backend</li>
+          <li>API keys stay private on the server</li>
+          <li>Supports 195+ countries and territories</li>
         </ul>
       </section>
     </main>

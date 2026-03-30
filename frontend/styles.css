@@ -43,51 +43,101 @@ body.theme-night {
 }
 
 h1 {
-	margin-top: 0;
+	margin: 0 0 0.5rem;
 	color: var(--purple-900);
+	font-size: clamp(1.8rem, 5vw, 2.4rem);
+}
+
+.header {
+	text-align: center;
+	margin-bottom: 2rem;
+}
+
+.tagline {
+	margin: 0;
+	font-size: 0.95rem;
+	color: var(--text-soft);
 }
 
 p {
 	color: var(--text-soft);
 }
 
-.controls {
-	display: flex;
+.location-picker {
+	display: grid;
+	grid-template-columns: 1fr 1fr auto;
 	gap: 0.75rem;
-	margin: 1rem 0;
+	margin: 2rem 0 1.5rem;
+	align-items: flex-end;
 }
 
-input {
-	flex: 1;
+.picker-section {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+}
+
+.picker-section label {
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: var(--text-main);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.picker-input {
 	padding: 0.75rem;
 	border: 1px solid #8ecae6;
 	border-radius: 0.5rem;
 	outline: none;
 	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+	font-size: 0.95rem;
+	background: var(--surface);
 }
 
-input:focus {
+.picker-input:focus {
 	border-color: var(--purple-500);
 	box-shadow: 0 0 0 3px rgba(123, 44, 191, 0.18);
 }
 
-button {
+select.picker-input {
+	cursor: pointer;
+	appearance: none;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235a189a' d='M1 4l5 4 5-4'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 0.5rem center;
+	padding-right: 2rem;
+}
+
+input.picker-input {
+	flex: 1;
+}
+
+input.picker-input::placeholder {
+	color: var(--text-soft);
+	opacity: 0.7;
+}
+
+.search-button {
 	border: none;
 	background: linear-gradient(135deg, var(--purple-700) 0%, var(--teal-700) 100%);
 	color: #fff;
-	padding: 0.75rem 1rem;
+	padding: 0.75rem 1.5rem;
 	border-radius: 0.5rem;
 	cursor: pointer;
 	font-weight: 600;
 	transition: transform 0.2s ease, filter 0.2s ease;
+	white-space: nowrap;
 }
 
-button:hover {
+.search-button:hover {
 	filter: brightness(1.08);
 	transform: translateY(-1px);
 }
 
-.card {
+.card,
+.result-card,
+.info-card {
 	background: var(--surface);
 	border-radius: 0.75rem;
 	border: 1px solid var(--teal-200);
@@ -96,9 +146,15 @@ button:hover {
 	box-shadow: 0 10px 24px rgba(43, 10, 61, 0.08);
 }
 
-.card h2 {
+.card h2,
+.result-card h2,
+.info-card h2 {
 	margin-top: 0;
 	color: var(--purple-700);
+}
+
+.info-card ul {
+	margin-bottom: 0;
 }
 
 #result {
@@ -115,8 +171,18 @@ button:hover {
 	color: inherit;
 }
 
-#result.is-error {
-	background: linear-gradient(145deg, #5a1124 0%, #8a1538 100%);
+#result .placeholder-text {
+	margin: 0;
+	text-align: center;
+	padding: 2rem 1rem;
+	opacity: 0.9;
+}
+
+.location-info {
+	display: block;
+	font-size: 0.85rem;
+	opacity: 0.9;
+	margin-top: 0.2rem;
 }
 
 #result.is-loading {
@@ -348,9 +414,24 @@ button:hover {
 	margin-bottom: 0;
 }
 
+@media (max-width: 900px) {
+	.location-picker {
+		grid-template-columns: 1fr;
+		grid-template-rows: auto auto auto;
+	}
+
+	.search-button {
+		width: 100%;
+	}
+}
+
 @media (max-width: 600px) {
-	.controls {
-		flex-direction: column;
+	.location-picker {
+		grid-template-columns: 1fr;
+	}
+
+	.search-button {
+		width: 100%;
 	}
 
 	.weather-grid {

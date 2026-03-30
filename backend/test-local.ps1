@@ -21,12 +21,12 @@ if ($envContent -match "OPENWEATHER_API_KEY=your_openweather_api_key_here" -or $
 }
 
 Write-Host "Installing dependencies..."
-npm install
+npm.cmd install
 
 Write-Host "Starting server in background..."
 $serverJob = Start-Job -ScriptBlock {
     Set-Location $using:PSScriptRoot
-    npm start
+    npm.cmd start
 }
 
 Start-Sleep -Seconds 6

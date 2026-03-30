@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  hot-cold-world:
+    container_name: hot-cold-world-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: development
+      PORT: 5000
+      OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY:-your_openweather_api_key_here}
+    volumes:
+      - ./backend/server.js:/app/backend/server.js:ro
+      - ./frontend:/app/frontend:ro
+    restart: unless-stopped
+    networks:
+      - hot-cold-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  hot-cold-network:
+    driver: bridge

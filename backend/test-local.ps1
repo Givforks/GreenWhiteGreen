@@ -1,5 +1,6 @@
 param(
-    [string]$City = "Lagos"
+    [string]$City = "Lagos",
+    [switch]$KeepServerRunning
 )
 
 $ErrorActionPreference = "Stop"
@@ -23,9 +24,17 @@ Write-Host "Installing dependencies..."
 npm.cmd install
 
 Write-Host "Starting server in background..."
-$serverJob = Start-Job -ScriptBlock {
-    Set-Location $using:PSScriptRoot
-    npm.cmd start
+$serverJob = $null
+$serverProcess = $null
+
+if ($KeepServerRunning) {
+    $serverProcess = Start-Process -FilePath "npm.cmd" -ArgumentList "start" -WorkingDirectory $PSScriptRoot -PassThru
+}
+else {
+    $serverJob = Start-Job -ScriptBlock {
+        Set-Location $using:PSScriptRoot
+        npm.cmd start
+    }
 }
 
 Start-Sleep -Seconds 6
@@ -39,14 +48,22 @@ try {
     Invoke-RestMethod "http://localhost:5000/api/weather?city=$encodedCity" | ConvertTo-Json -Depth 5
 
     Write-Host "\nFrontend URL: http://localhost:5000"
+    if ($KeepServerRunning) {
+        Write-Host "Server is still running in background."
+        if ($null -ne $serverProcess) {
+            Write-Host "Server PID: $($serverProcess.Id)"
+            Write-Host "When done, stop it with: Stop-Process -Id $($serverProcess.Id)"
+        }
+    }
 }
 catch {
     Write-Host "Test failed: $($_.Exception.Message)"
     throw
 }
 finally {
-    if ($null -ne $serverJob) {
+    if ($null -ne $serverJob -and -not $KeepServerRunning) {
         Stop-Job $serverJob -ErrorAction SilentlyContinue
         Remove-Job $serverJob -ErrorAction SilentlyContinue
+        Write-Host "Server job stopped after tests."
     }
 }

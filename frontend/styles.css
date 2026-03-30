@@ -18,11 +18,22 @@ body {
 	margin: 0;
 	font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 	color: var(--text-main);
+	transition: background 0.6s ease;
+	min-height: 100vh;
+}
+
+body.theme-day {
 	background:
 		radial-gradient(circle at 10% 10%, rgba(20, 184, 166, 0.25), transparent 40%),
 		radial-gradient(circle at 90% 20%, rgba(123, 44, 191, 0.32), transparent 35%),
 		linear-gradient(165deg, #f5f3ff 0%, #e6fffb 100%);
-	min-height: 100vh;
+}
+
+body.theme-night {
+	background:
+		radial-gradient(circle at 20% 15%, rgba(14, 116, 144, 0.25), transparent 35%),
+		radial-gradient(circle at 80% 10%, rgba(91, 33, 182, 0.45), transparent 40%),
+		linear-gradient(165deg, #1e1b4b 0%, #0f172a 100%);
 }
 
 .container {
@@ -139,6 +150,110 @@ button:hover {
 	margin: 0.6rem 0 1rem;
 }
 
+.weather-hero {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 1rem;
+}
+
+.weather-icon {
+	width: 68px;
+	height: 68px;
+	border-radius: 50%;
+	position: relative;
+	flex-shrink: 0;
+	animation: floaty 2.6s ease-in-out infinite;
+}
+
+.weather-icon::before,
+.weather-icon::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: 50%;
+}
+
+.weather-icon-clear {
+	background: radial-gradient(circle, #fde047 20%, #f59e0b 75%);
+	box-shadow: 0 0 18px rgba(253, 224, 71, 0.7);
+}
+
+.weather-icon-clear::after {
+	inset: -8px;
+	border: 2px dashed rgba(255, 255, 255, 0.7);
+	animation: spin 8s linear infinite;
+}
+
+.weather-icon-cloudy {
+	background: linear-gradient(145deg, #c4b5fd 0%, #99f6e4 100%);
+}
+
+.weather-icon-cloudy::before {
+	inset: 18px -10px -8px 8px;
+	border-radius: 24px;
+	background: rgba(255, 255, 255, 0.9);
+	box-shadow: -18px 6px 0 rgba(255, 255, 255, 0.75), 16px 8px 0 rgba(255, 255, 255, 0.65);
+}
+
+.weather-icon-rain {
+	background: linear-gradient(145deg, #7c3aed 0%, #0ea5e9 100%);
+}
+
+.weather-icon-rain::after {
+	inset: 20px 18px 6px;
+	border-radius: 0;
+	background: repeating-linear-gradient(
+		to right,
+		rgba(255, 255, 255, 0.95) 0,
+		rgba(255, 255, 255, 0.95) 3px,
+		transparent 3px,
+		transparent 10px
+	);
+	animation: rainShift 0.9s linear infinite;
+}
+
+.weather-icon-storm {
+	background: linear-gradient(145deg, #4c1d95 0%, #0f766e 100%);
+}
+
+.weather-icon-storm::after {
+	inset: 18px 26px 8px;
+	clip-path: polygon(42% 0, 70% 0, 52% 40%, 75% 40%, 28% 100%, 42% 56%, 24% 56%);
+	background: #fef08a;
+	animation: flicker 1.2s ease-in-out infinite;
+	border-radius: 0;
+}
+
+.weather-icon-snow {
+	background: linear-gradient(145deg, #a5b4fc 0%, #5eead4 100%);
+}
+
+.weather-icon-snow::after {
+	inset: 10px;
+	background: radial-gradient(circle at 25% 35%, #fff 0 4px, transparent 5px),
+		radial-gradient(circle at 70% 55%, #fff 0 4px, transparent 5px),
+		radial-gradient(circle at 48% 75%, #fff 0 4px, transparent 5px);
+	animation: pulse 1.8s ease-in-out infinite;
+}
+
+.weather-icon-mist {
+	background: linear-gradient(145deg, #6d28d9 0%, #14b8a6 100%);
+}
+
+.weather-icon-mist::after {
+	inset: 16px 10px;
+	border-radius: 12px;
+	background: repeating-linear-gradient(
+		to bottom,
+		rgba(255, 255, 255, 0.9) 0,
+		rgba(255, 255, 255, 0.9) 3px,
+		transparent 3px,
+		transparent 8px
+	);
+	animation: drift 2.2s ease-in-out infinite;
+}
+
 .weather-grid {
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -166,6 +281,67 @@ button:hover {
 	font-size: 1.05rem;
 	font-weight: 700;
 	margin: 0;
+}
+
+@keyframes floaty {
+	0%,
+	100% {
+		transform: translateY(0px);
+	}
+	50% {
+		transform: translateY(-4px);
+	}
+}
+
+@keyframes spin {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes rainShift {
+	from {
+		transform: translateY(-2px);
+	}
+	to {
+		transform: translateY(5px);
+	}
+}
+
+@keyframes flicker {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	35% {
+		opacity: 0.5;
+	}
+	70% {
+		opacity: 0.9;
+	}
+}
+
+@keyframes pulse {
+	0%,
+	100% {
+		transform: scale(1);
+	}
+	50% {
+		transform: scale(1.08);
+	}
+}
+
+@keyframes drift {
+	0%,
+	100% {
+		transform: translateX(0);
+	}
+	50% {
+		transform: translateX(4px);
+	}
 }
 
 .note ul {

@@ -2,6 +2,32 @@ const cityInput = document.getElementById("cityInput");
 const searchBtn = document.getElementById("searchBtn");
 const result = document.getElementById("result");
 
+function setTheme(isDay) {
+  document.body.classList.remove("theme-day", "theme-night");
+  document.body.classList.add(isDay ? "theme-day" : "theme-night");
+}
+
+function pickIconKind(data) {
+  const iconCode = String(data.iconCode || "");
+  const condition = String(data.condition || "").toLowerCase();
+
+  if (iconCode.startsWith("11") || condition.includes("thunder")) return "storm";
+  if (iconCode.startsWith("13") || condition.includes("snow")) return "snow";
+  if (
+    iconCode.startsWith("09") ||
+    iconCode.startsWith("10") ||
+    condition.includes("rain") ||
+    condition.includes("drizzle")
+  ) {
+    return "rain";
+  }
+  if (iconCode.startsWith("50") || condition.includes("mist") || condition.includes("haze")) {
+    return "mist";
+  }
+  if (iconCode.startsWith("01") || condition.includes("clear")) return "clear";
+  return "cloudy";
+}
+
 function setMessage(message, type = "info") {
   result.classList.remove("is-error", "is-loading");
   if (type === "error") {
@@ -32,13 +58,19 @@ async function getWeather() {
       return;
     }
 
+    const iconKind = pickIconKind(data);
+    setTheme(Boolean(data.isDay));
+
     result.classList.remove("is-error", "is-loading");
     result.innerHTML = `
       <div class="weather-head">
         <h2>${data.city}, ${data.country}</h2>
         <span class="weather-tag">${data.condition}</span>
       </div>
-      <div class="weather-main">${Math.round(data.temperatureC)} C</div>
+      <div class="weather-hero">
+        <div class="weather-main">${Math.round(data.temperatureC)} C</div>
+        <div class="weather-icon weather-icon-${iconKind}" aria-hidden="true"></div>
+      </div>
       <div class="weather-grid">
         <article class="metric">
           <p class="metric-label">Feels Like</p>
@@ -65,3 +97,5 @@ cityInput.addEventListener("keydown", (event) => {
     getWeather();
   }
 });
+
+setTheme(true);

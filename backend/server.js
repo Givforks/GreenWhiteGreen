@@ -58,6 +58,8 @@ app.get("/api/weather", async (req, res) => {
       temperatureC: data.main?.temp,
       feelsLikeC: data.main?.feels_like,
       condition: data.weather?.[0]?.description,
+      iconCode: data.weather?.[0]?.icon,
+      isDay: String(data.weather?.[0]?.icon || "").endsWith("d"),
       humidity: data.main?.humidity,
       windSpeed: data.wind?.speed,
     });
